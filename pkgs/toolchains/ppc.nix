@@ -1,23 +1,9 @@
-# References:
-# - https://gcc.gnu.org/install/index.html
 {
-  lib,
-  stdenv,
   fetchurl,
   fetchFromGitHub,
-  texinfo,
-  perl,
-  gmp,
-  mpfr,
-  libmpc,
-  isl,
-  zstd,
-}:
-stdenv.mkDerivation (finalAttrs: {
+}: finalAttrs: {
   pname = "noobkitPPC";
   version = "45.2";
-
-  __structuredAttrs = true;
 
   srcs = [
     (fetchFromGitHub rec {
@@ -43,43 +29,12 @@ stdenv.mkDerivation (finalAttrs: {
       hash = "sha256-DBZqOeG/CVHfr81olJ/g5LbTZYCB1igvOa7vxjEPLxM=";
     })
   ];
-  sourceRoot = ".";
 
-  nativeBuildInputs = [texinfo perl];
-  buildInputs = [gmp mpfr libmpc isl zstd];
-
-  hardeningDisable = ["format"];
   env = {
-    DKN_NAME = finalAttrs.pname;
-    DKN_VERSION = finalAttrs.version;
-    DKN_BUGURL = "${finalAttrs.meta.homepage}/issues";
     BUILD_DKPRO_PACKAGE = 2;
   };
 
-  patchPhase = ''
-    runHook prePatch
-    '${stdenv.shell}' '${./apply_patches.sh}'
-    runHook postPatch
-  '';
-  buildPhase = ''
-    runHook preBuild
-    export DKN_PREFIX="$prefix"
-    '${stdenv.shell}' '${./build.sh}'
-    runHook postBuild
-  '';
-  dontInstall = true;
-
   meta = {
     description = "Toolchain for Nintendo GameCube & Wii homebrew development";
-    homepage = "https://github.com/devkitNoob/devkitNoob";
-    license = [
-      # Binutils and GCC
-      lib.licenses.gpl3Plus
-
-      # Newlib
-      lib.licenses.gpl2Plus
-    ];
-    # TODO maintainers = [ lib.maintainers.novenary ];
-    platforms = lib.platforms.unix;
   };
-})
+}
